@@ -1,0 +1,17 @@
+syntax="proto2";
+
+package nlper;
+
+option cc_generic_services = true;
+
+message HttpRequest {
+};
+
+message HttpResponse {
+};
+
+service HttpService {
+        rpc run_semtopic(HttpRequest) returns (HttpResponse);
+        rpc run_qdmatch(HttpRequest) returns (HttpResponse);
+        rpc run_ddmatch(HttpRequest) returns (HttpResponse);
+};

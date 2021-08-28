@@ -1,0 +1,19 @@
+INCLUDE(ExternalProject)
+
+SET(GTEST_SOURCES_DIR ${THIRD_PARTY_PATH}/gtest)
+SET(GTEST_INSTALL_DIR ${THIRD_PARTY_PATH}/)
+ExternalProject_Add(
+    extern_gtest
+    ${EXTERNAL_PROJECT_LOG_ARGS}
+    DEPENDS         ${GTEST_DEPENDS}
+    DOWNLOAD_DIR          ${GTEST_SOURCES_DIR}
+    DOWNLOAD_COMMAND      cd ${GTEST_SOURCES_DIR} && tar zxvf googletest_1_8_0.tar.gz && cd ./googletest
+    DOWNLOAD_NO_PROGRESS  1
+    PREFIX          ${GTEST_SOURCES_DIR}
+    UPDATE_COMMAND  ""
+    BUILD_COMMAND   cd ${GTEST_SOURCES_DIR}/googletest && cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_GMOCK=ON -DCMAKE_INSTALL_PREFIX=${GTEST_INSTALL_DIR} ./ && make -j8
+    CONFIGURE_COMMAND ""
+    INSTALL_COMMAND cd ${GTEST_SOURCES_DIR}/googletest && make install
+    BUILD_IN_SOURCE      1
+)
+

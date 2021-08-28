@@ -1,0 +1,42 @@
+INCLUDE(ExternalProject)
+
+SET(ZLIB_SOURCES_DIR ${THIRD_PARTY_PATH}/zlib)
+SET(ZLIB_INSTALL_DIR ${THIRD_PARTY_PATH}/install/zlib)
+
+SET(ZLIB_ROOT ${ZLIB_INSTALL_DIR} CACHE FILEPATH "zlib root directory." FORCE)
+SET(ZLIB_INCLUDE_DIR "${ZLIB_INSTALL_DIR}/include" CACHE PATH "zlib include directory." FORCE)
+SET(ZLIB_LIBRARIES "${ZLIB_INSTALL_DIR}/lib/libz.a" CACHE FILEPATH "zlib library." FORCE)
+
+INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(${THIRD_PARTY_PATH}/install)
+
+ExternalProject_Add(
+    extern_zlib
+    ${EXTERNAL_PROJECT_LOG_ARGS}
+    DOWNLOAD_DIR    ${ZLIB_SOURCES_DIR}
+    DOWNLOAD_COMMAND cd ${ZLIB_SOURCES_DIR} && tar zxvf zlib_1_2_8.tar.gz && cd ./zlib
+    DOWNLOAD_NO_PROGRESS  1
+    PREFIX          ${ZLIB_SOURCES_DIR}
+    UPDATE_COMMAND  ""
+    BUILD_COMMAND   cd ${ZLIB_SOURCES_DIR}/zlib && cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_MACOSX_RPATH=ON -DCMAKE_INSTALL_PREFIX=${ZLIB_INSTALL_DIR} ./ && make -j8
+    CONFIGURE_COMMAND ""
+    INSTALL_COMMAND cd ${ZLIB_SOURCES_DIR}/zlib && make install
+    BUILD_IN_SOURCE      1
+)
+
+ADD_LIBRARY(zlib STATIC IMPORTED GLOBAL)
+SET_PROPERTY(TARGET zlib PROPERTY IMPORTED_LOCATION ${ZLIB_LIBRARIES})
+ADD_DEPENDENCIES(zlib extern_zlib)
+add_custom_command(TARGET extern_zlib POST_BUILD
+            COMMAND mkdir -p third_party/lib/
+            COMMAND mkdir -p third_party/include/
+            COMMAND ${CMAKE_COMMAND} -E copy ${ZLIB_LIBRARIES} third_party/lib/
+            COMMAND ${CMAKE_COMMAND} -E copy_directory ${ZLIB_INCLUDE_DIR} third_party/include/
+)
+
+LIST(APPEND external_project_dependencies zlib)
+
+IF(WITH_C_API)
+  INSTALL(DIRECTORY ${ZLIB_INCLUDE_DIR} DESTINATION third_party/zlib)
+  INSTALL(FILES ${ZLIB_LIBRARIES} DESTINATION third_party/zlib/lib)
+ENDIF()

@@ -1,0 +1,86 @@
+syntax="proto2";
+
+package nlper;
+
+message DictConfig {
+    required string name = 1;
+    required string type = 2;
+    required string path = 3;
+    optional string blob_name = 4;
+    optional bool is_reload_able = 5;
+}
+message DictManagerConfig {
+    required string name = 1;
+    repeated DictConfig dict_config = 2;
+}
+
+message AnalysisMethodConfig {
+    required string name = 1;
+    required string type = 2;
+    required uint32 level = 3;
+    required string using_dict_name = 4;
+    
+    optional bool need_phrase_seg = 5;
+    
+    //thread params
+    optional uint32 thread_num = 6;
+    
+}
+
+message AnalysisConfig {
+    optional string name = 1;
+    optional string hide_tag = 2;
+    repeated AnalysisMethodConfig analysis_method = 3;
+}
+
+message PatternConfig {
+    required string pat_fname = 1;
+    required string dict_fname = 2;
+    required string igno_fname = 3;
+}
+
+message MatchingConfig {
+    required string name = 1;
+    required string type = 2;
+    optional string using_dict_name = 3;
+    required int32 output_num = 4;
+    required float feature_weight = 5;
+    optional PatternConfig pattern = 6;
+}
+
+message MatchConfig {
+    optional string name = 1;
+    repeated MatchingConfig matching_config = 2;
+}
+
+message NlperStrategyConfig {
+    optional string analysis_config = 1;
+    optional string match_config = 2;
+}
+
+message ReqPreprocPluginConfig {
+    required string type = 1;
+    required string name = 2;
+}
+
+message ReqPostprocPluginConfig {
+    required string type = 1;
+    required string name = 2;
+}
+
+message ServerConfig {
+    required int32 idle_timeout_sec = 1;
+    required int32 max_concurrency = 2;
+    required string port = 3;
+    required string method = 4;
+    required string server_conf_dir = 5;
+    required string log_conf_file = 6;
+    required string nlper_dict_conf_dir = 7;
+    required string nlper_conf_dir= 8;
+    required ReqPreprocPluginConfig qdmatch_preproc_plugin = 9;
+    required ReqPostprocPluginConfig qdmatch_postproc_plugin = 10;
+    required ReqPreprocPluginConfig ddmatch_preproc_plugin = 11;
+    required ReqPostprocPluginConfig ddmatch_postproc_plugin = 12;
+    required ReqPreprocPluginConfig semtopic_preproc_plugin = 13;
+    required ReqPostprocPluginConfig semtopic_postproc_plugin = 14;
+}
